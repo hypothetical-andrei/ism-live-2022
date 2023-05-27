@@ -81,6 +81,16 @@ try {
   await restaurant1.update({
     name: 'Updated restaurant 1'
   })
+  const restaurant3 = await Restaurant.create({
+    name: 'Restaurant 3',
+    openingHour: '10:00',
+    closingHour: '17:00'
+  })
+  const restaurant4 = await Restaurant.create({
+    name: 'A Restaurant 4',
+    openingHour: '10:00',
+    closingHour: '17:00'
+  })
   const location1 = await Location.create({
     street: 'some street',
     number: '1A',
@@ -122,6 +132,58 @@ try {
   
   await restaurant1.removeLocation(location3)
   await location3.destroy()
+
+  let restaurants = await Restaurant.findAll({
+    raw: true
+  })
+  restaurants = await Restaurant.findAll({
+    attributes: ['id', 'name', 'openingHour'],
+    raw: true
+  })
+  
+  restaurants = await Restaurant.findAll({
+    where: {
+      name: 'Updated restaurant 1'
+    },
+    attributes: ['id', 'name', 'openingHour'],
+    raw: true
+  })
+
+  restaurants = await Restaurant.findAll({
+    where: {
+      name: {
+        [Sequelize.Op.like]: '%pdated%'
+      }
+    },
+    attributes: ['id', 'name', 'openingHour'],
+    raw: true
+  })
+
+  restaurants = await Restaurant.findAll({
+    attributes: ['id', 'name', 'openingHour'],
+    raw: true,
+    order: [
+      ['name', 'ASC']
+    ],
+    limit: 2,
+    offset: 0
+  })
+
+  restaurants = await Restaurant.findAll({
+    include: [Location],
+    raw: true
+  })
+
+  restaurants = await Restaurant.findAll({
+    include: [{
+      model: Location
+    }, {
+      model: Menu,
+      include: MenuItem
+    }]
+  })
+
+  console.log(JSON.stringify(restaurants, null, 2))
 
 } catch (error) {
   console.warn(error)
