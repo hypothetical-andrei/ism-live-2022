@@ -4,9 +4,9 @@ let connection
 
 try {
   connection = await mysql.createConnection({
-    host: '172.19.0.2',
+    host: 'localhost',
     database: 'ismv4',
-    user: 'root',
+    user: 'app1',
     password: 'welcome123'
   })
   
