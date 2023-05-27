@@ -8,7 +8,7 @@ const sequelize = new Sequelize({
   database: 'ismv4'
 })
 
-const Restaurant = sequelize.define('restaurant', {
+const Restaurant = sequelize.define('Restaurant', {
   name: {
     type: Sequelize.STRING,
     allowNull: false
@@ -22,3 +22,46 @@ const Restaurant = sequelize.define('restaurant', {
     allowNull: false
   }
 })
+
+const Location = sequelize.define('Location', {
+  street: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  number: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  city: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
+})
+
+const Menu = sequelize.define('Menu', {
+  description: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
+})
+
+const MenuItem = sequelize.define('MenuItem', {
+  description: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  price: {
+    type: Sequelize.FLOAT,
+    allowNull: false
+  }
+})
+
+Restaurant.hasMany(Location)
+Location.belongsTo(Restaurant)
+
+Restaurant.hasOne(Menu)
+Menu.belongsTo(Restaurant)
+
+Menu.belongsToMany(MenuItem, { through: 'MenuItemMapping' })
+MenuItem.belongsToMany(Menu, { through: 'MenuItemMapping' })
+
