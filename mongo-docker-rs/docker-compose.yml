@@ -1,0 +1,53 @@
+version: '3.1'
+
+services: 
+  mongors1:
+    network_mode: bridge
+    hostname: mongors1
+    container_name: mongors1
+    image: mongo:latest
+    ports:
+      - 60031:27017 
+    volumes:
+      - mongors1-volume:/home/container-data
+    restart: always
+    command: >
+      sh -c "
+            chown -R mongodb: /home/container-data &&
+            mongod --replSet replica-set-0 --dbpath /home/container-data --bind_ip 0.0.0.0"
+  mongors2:
+    network_mode: bridge
+    hostname: mongors2
+    container_name: mongors2
+    image: mongo:latest
+    ports:
+      - 60032:27017
+    volumes:
+      - mongors2-volume:/home/container-data
+    restart: always
+    command: >
+      sh -c "
+            chown -R mongodb: /home/container-data && 
+            mongod  --replSet replica-set-0 --dbpath /home/container-data --bind_ip 0.0.0.0"
+  mongors3:
+    network_mode: bridge
+    hostname: mongors3
+    container_name: mongors3
+    image: mongo:latest
+    ports:
+      - 60033:27017
+    volumes:
+      - mongors3-volume:/home/container-data
+    restart: always
+    command: >
+      sh -c "
+            chown -R mongodb: /home/container-data &&
+            mongod  --replSet replica-set-0 --dbpath /home/container-data --bind_ip 0.0.0.0"
+            
+volumes:
+  mongors1-volume:
+    external: true
+  mongors2-volume:
+    external: true
+  mongors3-volume:
+    external: true
