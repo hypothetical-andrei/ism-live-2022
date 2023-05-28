@@ -155,6 +155,21 @@ try {
   restaurant1.locations.push(savedLocation3)
   await restaurant1.save()
 
+  await Restaurant.updateMany({}, { $pull: { locations: location3._id }})
+  await Location.findByIdAndDelete(location3)
+  
+  const restaurant = await Restaurant.findOne({ name: 'Burger King' })
+                            .populate([{
+                              path: 'menu',
+                              populate: {
+                                path: 'items'
+                              }
+                            }, {
+                              path: 'locations'
+                            }])
+
+  console.log(JSON.stringify(restaurant, null, 2))
+
   await mongoose.connection.close()
 } catch (error) {
   console.warn(error)
