@@ -44,6 +44,8 @@ try {
     useNewUrlParser: true
   })
 
+  // mongoose.set('debug', true)
+
   let restaurant1 = new Restaurant({
     name: 'McD',
     openingHour: '8:00 AM',
@@ -159,16 +161,71 @@ try {
   await Location.findByIdAndDelete(location3)
   
   const restaurant = await Restaurant.findOne({ name: 'Burger King' })
-                            .populate([{
-                              path: 'menu',
-                              populate: {
-                                path: 'items'
-                              }
-                            }, {
-                              path: 'locations'
-                            }])
+    .populate([{
+      path: 'menu',
+      populate: {
+        path: 'items'
+      }
+    }, {
+      path: 'locations'
+    }])
 
-  console.log(JSON.stringify(restaurant, null, 2))
+  // console.log(JSON.stringify(restaurant, null, 2))
+
+  const pipeline = [{
+    $match: {
+      name: 'Burger King'
+    }
+  }, {
+    $lookup: {
+      from: 'menus',
+      localField: 'menu',
+      foreignField: '_id',
+      as: 'menu'
+    }
+  }, {
+    $unwind: '$menu'
+  }, {
+    $lookup: {
+      from: 'menuitems',
+      localField: 'menu.items',
+      foreignField: '_id',
+      as: 'items'
+    }
+  }, {
+    $project: {
+      _id: 0,
+      items: 1
+    }
+  }, {
+    $facet: {
+      records: [{
+        $unwind: '$items'
+      }, {
+        $replaceRoot: {
+          newRoot: '$items'
+        }
+      }],
+      count: [{
+        $group: {
+          _id: null,
+          count: {
+            $sum: {
+              $size: '$items'
+            }
+          }
+        }
+      }, {
+        $project: {
+          _id: 0
+        }
+      }]
+    }
+  }]
+
+  const result = await Restaurant.aggregate(pipeline)
+
+  console.log(JSON.stringify(result, null, 2))
 
   await mongoose.connection.close()
 } catch (error) {
